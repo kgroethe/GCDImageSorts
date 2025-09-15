@@ -62,11 +62,13 @@ public:
     virtual void SwapPixels(uint32_t indexA, uint32_t indexB);
     virtual bool InOrder(uint32_t indexA, uint32_t indexB);
     virtual void Draw();
+    virtual void ForceDraw();  // Draw without timing throttle
     virtual void UpdateStats();
     
     // Timing methods
     virtual void StartSortTimer();
     virtual void EndSortTimer();
+    virtual bool IsRunning() const;
     virtual void DrawTimingOverlay();
     virtual void DrawAlgorithmOverlay();
     virtual void clearAllOverlays();
@@ -77,6 +79,7 @@ public:
     virtual NSString* formatDurationMs(double durationMs);
     virtual void createPersistentOverlayFields();
     virtual void updateOverlayInfo();
+    virtual void resetSorting();
     
     bool GetShowStats();
     void SetShowStats(bool show);

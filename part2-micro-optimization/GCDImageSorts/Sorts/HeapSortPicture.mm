@@ -20,6 +20,9 @@ void HeapSortPicture::Sort() {
         SwapPixels(0, i);  // Move current root to end
         Heapify(i, 0);     // Call heapify on the reduced heap
     }
+    
+    // Force final display update to show completed sort
+    ForceDraw();
 }
 
 void HeapSortPicture::BuildHeap() {

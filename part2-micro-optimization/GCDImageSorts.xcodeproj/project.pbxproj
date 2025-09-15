@@ -17,6 +17,10 @@
 		8B9C0D1E2F3A4B5C6D7E8F9A /* QuickSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B9C0D1E2F3A4B5C6D7E8F99 /* QuickSortPicture.mm */; };
 		9C0D1E2F3A4B5C6D7E8F9A0B /* HeapSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0D1E2F3A4B5C6D7E8F9A0A /* HeapSortPicture.mm */; };
 		0D1E2F3A4B5C6D7E8F9A0B1C /* ThreadedQuickSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0D1E2F3A4B5C6D7E8F9A0B1B /* ThreadedQuickSortPicture.mm */; };
+		ABC123DEF456789012345678 /* OptimizedBubbleSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABC123DEF456789012345677 /* OptimizedBubbleSortPicture.mm */; };
+		ABCDEF1234567890QUICKBLD /* OptimizedQuickSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF1234567890QUICKMM1 /* OptimizedQuickSortPicture.mm */; };
+		FIXEDQS1234567890BUILD01 /* FixedQuickSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = FIXEDQS1234567890IMPL001 /* FixedQuickSortPicture.mm */; };
+		RADIX1234567890BUILD001 /* RadixSortPicture.mm in Sources */ = {isa = PBXBuildFile; fileRef = RADIX1234567890IMPL0001 /* RadixSortPicture.mm */; };
 		1E2F3A4B5C6D7E8F9A0B1C2D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1E2F3A4B5C6D7E8F9A0B1C2C /* MainMenu.xib */; };
 		F1A29384758677786958470A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1A29384758677786958470B /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -42,6 +46,14 @@
 		9C0D1E2F3A4B5C6D7E8F9A09 /* HeapSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeapSortPicture.h; sourceTree = "<group>"; };
 		0D1E2F3A4B5C6D7E8F9A0B1B /* ThreadedQuickSortPicture.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ThreadedQuickSortPicture.mm; sourceTree = "<group>"; };
 		0D1E2F3A4B5C6D7E8F9A0B1A /* ThreadedQuickSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreadedQuickSortPicture.h; sourceTree = "<group>"; };
+		ABC123DEF456789012345677 /* OptimizedBubbleSortPicture.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OptimizedBubbleSortPicture.mm; sourceTree = "<group>"; };
+		ABC123DEF456789012345676 /* OptimizedBubbleSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptimizedBubbleSortPicture.h; sourceTree = "<group>"; };
+		ABCDEF1234567890QUICKMM1 /* OptimizedQuickSortPicture.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OptimizedQuickSortPicture.mm; sourceTree = "<group>"; };
+		ABCDEF1234567890QUICKH01 /* OptimizedQuickSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptimizedQuickSortPicture.h; sourceTree = "<group>"; };
+		FIXEDQS1234567890IMPL001 /* FixedQuickSortPicture.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FixedQuickSortPicture.mm; sourceTree = "<group>"; };
+		FIXEDQS1234567890HEADER1 /* FixedQuickSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FixedQuickSortPicture.h; sourceTree = "<group>"; };
+		RADIX1234567890IMPL0001 /* RadixSortPicture.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RadixSortPicture.mm; sourceTree = "<group>"; };
+		RADIX1234567890HEADER01 /* RadixSortPicture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RadixSortPicture.h; sourceTree = "<group>"; };
 		1E2F3A4B5C6D7E8F9A0B1C2C /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		2F3A4B5C6D7E8F9A0B1C2D3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F1A29384758677786958470B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -91,6 +103,14 @@
 				9C0D1E2F3A4B5C6D7E8F9A0A /* HeapSortPicture.mm */,
 				0D1E2F3A4B5C6D7E8F9A0B1A /* ThreadedQuickSortPicture.h */,
 				0D1E2F3A4B5C6D7E8F9A0B1B /* ThreadedQuickSortPicture.mm */,
+				ABC123DEF456789012345676 /* OptimizedBubbleSortPicture.h */,
+				ABC123DEF456789012345677 /* OptimizedBubbleSortPicture.mm */,
+				ABCDEF1234567890QUICKH01 /* OptimizedQuickSortPicture.h */,
+				ABCDEF1234567890QUICKMM1 /* OptimizedQuickSortPicture.mm */,
+				FIXEDQS1234567890HEADER1 /* FixedQuickSortPicture.h */,
+				FIXEDQS1234567890IMPL001 /* FixedQuickSortPicture.mm */,
+				RADIX1234567890HEADER01 /* RadixSortPicture.h */,
+				RADIX1234567890IMPL0001 /* RadixSortPicture.mm */,
 			);
 			path = Sorts;
 			sourceTree = "<group>";
@@ -206,6 +226,10 @@
 				8B9C0D1E2F3A4B5C6D7E8F9A /* QuickSortPicture.mm in Sources */,
 				9C0D1E2F3A4B5C6D7E8F9A0B /* HeapSortPicture.mm in Sources */,
 				0D1E2F3A4B5C6D7E8F9A0B1C /* ThreadedQuickSortPicture.mm in Sources */,
+				ABC123DEF456789012345678 /* OptimizedBubbleSortPicture.mm in Sources */,
+				ABCDEF1234567890QUICKBLD /* OptimizedQuickSortPicture.mm in Sources */,
+				FIXEDQS1234567890BUILD01 /* FixedQuickSortPicture.mm in Sources */,
+				RADIX1234567890BUILD001 /* RadixSortPicture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +302,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_OBJC_INTERFACE_HEADER = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				LLVM_LTO = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -313,6 +339,10 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_UNROLL_LOOPS = YES;
+				GCC_FAST_MATH = YES;
+				OTHER_CFLAGS = "-march=native";
+				OTHER_CPLUSPLUSFLAGS = "-march=native";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

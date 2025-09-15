@@ -13,7 +13,21 @@
 
 void QuickSortPicture::Sort() {
     if (linearPictSize > 1) {
+        NSDate *startDate = [NSDate date];
         qsort(0, linearPictSize - 1);
+        NSDate *endDate = [NSDate date];
+        NSTimeInterval totalSeconds = [endDate timeIntervalSinceDate:startDate];
+        
+        NSLog(@"Regular QuickSort completed: %.3f seconds, %llu swaps, %llu comparisons", 
+              totalSeconds, swaps, comparisons);
+        
+        NSString *resultString = [NSString stringWithFormat:
+            @"QuickSort: %.3f seconds, %llu swaps, %llu comparisons\n", 
+            totalSeconds, swaps, comparisons];
+        [resultString writeToFile:@"/tmp/quicksort_result.txt" 
+                       atomically:YES 
+                         encoding:NSUTF8StringEncoding 
+                            error:nil];
     }
 }
 

@@ -63,6 +63,8 @@ NSString* ThreadedQuickSortPicture::GetBigONotation() {
 void ThreadedQuickSortPicture::Sort() {
     if (linearPictSize <= 1) return;
     
+    NSDate *startDate = [NSDate date];
+    
     if (algorithmType == 1) {
         // GCD Concurrent QuickSort
         active_tasks = 0;
@@ -78,7 +80,27 @@ void ThreadedQuickSortPicture::Sort() {
         mergeSort(0, linearPictSize - 1);
         delete[] tempArray;
         tempArray = nullptr;
+        
+        // Force final display update to show completed sort
+        ForceDraw();
     }
+    
+    NSDate *endDate = [NSDate date];
+    NSTimeInterval totalSeconds = [endDate timeIntervalSinceDate:startDate];
+    
+    NSString *sortName = (algorithmType == 1) ? @"GCD QuickSort" : @"Merge Sort";
+    NSString *fileName = (algorithmType == 1) ? @"/tmp/gcd_quicksort_result.txt" : @"/tmp/mergesort_result.txt";
+    
+    NSLog(@"%@ completed: %.3f seconds, %llu swaps, %llu comparisons", 
+          sortName, totalSeconds, swaps, comparisons);
+    
+    NSString *resultString = [NSString stringWithFormat:
+        @"%@: %.3f seconds, %llu swaps, %llu comparisons\n", 
+        sortName, totalSeconds, swaps, comparisons];
+    [resultString writeToFile:fileName 
+                   atomically:YES 
+                     encoding:NSUTF8StringEncoding 
+                        error:nil];
 }
 
 // GCD QuickSort Implementation
@@ -237,8 +259,8 @@ void ThreadedQuickSortPicture::merge(int32_t left, int32_t mid, int32_t right) {
     
     // Merge the temp arrays back into pixelIndexArray[left..right]
     while (i <= mid && j <= right) {
-        // Compare tempArray values directly using simple comparison
-        // This maintains the same sorting behavior as the original algorithms
+        // Compare the actual temp values
+        comparisons++;
         if (tempArray[i] <= tempArray[j]) {
             pixelIndexArray[k] = tempArray[i];
             i++;
@@ -247,14 +269,7 @@ void ThreadedQuickSortPicture::merge(int32_t left, int32_t mid, int32_t right) {
             j++;
         }
         k++;
-        
-        // Increment comparisons counter
-        comparisons++;
-        
-        // Visual update every few operations
-        if (comparisons % 500 == 0) {
-            Draw();
-        }
+        swaps++;  // Count each element placement as a swap for consistency
     }
     
     // Copy the remaining elements of left subarray, if any
@@ -262,6 +277,7 @@ void ThreadedQuickSortPicture::merge(int32_t left, int32_t mid, int32_t right) {
         pixelIndexArray[k] = tempArray[i];
         i++;
         k++;
+        swaps++;  // Count each move as a swap
     }
     
     // Copy the remaining elements of right subarray, if any
@@ -269,8 +285,6 @@ void ThreadedQuickSortPicture::merge(int32_t left, int32_t mid, int32_t right) {
         pixelIndexArray[k] = tempArray[j];
         j++;
         k++;
+        swaps++;  // Count each move as a swap
     }
-    
-    // Count this as a swap operation for stats consistency
-    swaps++;
 }

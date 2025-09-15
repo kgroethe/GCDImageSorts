@@ -1,5 +1,5 @@
 /* Localized versions of Info.plist keys */
 
-CFBundleName = "PThreadSorts";
-CFBundleShortVersionString = "PThreadSorts version 1.0.0";
-CFBundleGetInfoString = "PThreadSorts version 1.0.0, Copyright 2000, Apple Computer Inc.";
+CFBundleName = "GCDImageSorts";
+CFBundleShortVersionString = "GCDImageSorts version 2.0.0";
+CFBundleGetInfoString = "GCDImageSorts version 2.0.0, Copyright 2025";

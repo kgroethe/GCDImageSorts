@@ -27,4 +27,7 @@ void ShellSortPicture::Sort() {
             }
         }
     }
+    
+    // Force final display update to show completed sort
+    ForceDraw();
 }

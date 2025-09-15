@@ -12,8 +12,9 @@
 #include "BubbleSortPicture.h"
 
 void BubbleSortPicture::Sort() {
-    // Basic bubble sort implementation
-    NSLog(@"BubbleSort started with %u pixels", linearPictSize);
+    // Log start with timestamp
+    NSDate *startDate = [NSDate date];
+    NSLog(@"=== BubbleSort STARTED at %@ with %u pixels ===", startDate, linearPictSize);
     
     for (uint32_t i = 0; i < linearPictSize - 1; i++) {
         for (uint32_t j = 0; j < linearPictSize - i - 1; j++) {
@@ -23,12 +24,27 @@ void BubbleSortPicture::Sort() {
         }
         
         // Log progress periodically for larger arrays
-        if (linearPictSize > 1000 && i % 100 == 0) {
+        if (linearPictSize > 1000 && i % 200 == 0) {
             NSLog(@"BubbleSort progress: %u/%u passes completed", i, linearPictSize - 1);
         }
     }
     
-    NSLog(@"BubbleSort completed with %llu swaps, %llu comparisons", swaps, comparisons);
+    // Log completion with timestamp and detailed stats
+    NSDate *endDate = [NSDate date];
+    NSTimeInterval totalSeconds = [endDate timeIntervalSinceDate:startDate];
+    NSLog(@"=== BubbleSort COMPLETED at %@ ===", endDate);
+    NSLog(@"=== TOTAL TIME: %.2f seconds (%.0f ms) ===", totalSeconds, totalSeconds * 1000);
+    NSLog(@"=== FINAL STATS: %llu swaps, %llu comparisons ===", swaps, comparisons);
+    NSLog(@"=== PERFORMANCE: %.0f swaps/sec, %.0f comparisons/sec ===", 
+          swaps / totalSeconds, comparisons / totalSeconds);
+    
+    // Also write to file for easier retrieval
+    NSString *resultString = [NSString stringWithFormat:@"BubbleSort: %.2f seconds, %llu swaps, %llu comparisons\n", 
+                             totalSeconds, swaps, comparisons];
+    [resultString writeToFile:@"/tmp/bubble_result.txt" 
+                   atomically:YES 
+                     encoding:NSUTF8StringEncoding 
+                        error:nil];
 }
 
 void RBubbleSortPicture::Sort() {

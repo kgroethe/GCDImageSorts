@@ -16,6 +16,10 @@
 #import "QuickSortPicture.h"
 #import "HeapSortPicture.h"
 #import "ThreadedQuickSortPicture.h"
+#import "OptimizedBubbleSortPicture.h"
+#import "OptimizedQuickSortPicture.h"
+#import "FixedQuickSortPicture.h"
+#import "RadixSortPicture.h"
 #include <vector>
 
 @interface AppDelegate ()
@@ -30,7 +34,8 @@
     self.activeSortPictures = [[NSMutableArray alloc] init];
     self.algorithmVisibility = [[NSMutableArray alloc] init];
     self.sortingInProgress = NO;
-    self.sequentialSorting = NO; // Default to parallel sorting
+    self.sequentialSorting = YES; // Default to sequential sorting
+    self.shouldAutoStart = NO; // Default to manual start
     
     // Create windows for all sorting algorithms in a grid layout
     [self createAlgorithmComparisonGrid];
@@ -41,6 +46,15 @@
     
     // Set up global click monitor for victory screen dismissal
     [self setupVictoryScreenClickHandler];
+    
+    // Auto-start after 2 seconds if requested
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.shouldAutoStart) {
+            [self startAllSorting:nil];
+        }
+    });
+    //     [self startAllSorting:nil];
+    // });
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -50,30 +64,33 @@
 - (void)createAlgorithmComparisonGrid {
     // Create windows for different sorting algorithms arranged in a grid
     
-    // Arrange windows in a 2x4 grid for 8 algorithms (better for 640x480 windows)
-    int windowWidth = 640;
-    int windowHeight = 480;
-    int spacing = 20;
+    // Arrange windows in a 3x3 grid for 9 algorithms (perfect square layout)
+    int windowWidth = 480;
+    int windowHeight = 360;
+    int spacing = 15;
     
     // Get screen dimensions to position at top of screen
     NSScreen* mainScreen = [NSScreen mainScreen];
     NSRect screenFrame = [mainScreen visibleFrame];
     
     int startX = 50;
-    int startY = screenFrame.size.height - windowHeight - 50;  // Start from top of screen
+    // Calculate starting Y to fit 3 rows on screen with spacing (macOS coordinates: Y=0 at bottom)
+    int totalGridHeight = 3 * windowHeight + 2 * spacing;
+    int startY = screenFrame.size.height - windowHeight - 50;  // Start from top
     
-    // Create all algorithm instances ordered by true performance (fastest to slowest)
+    // Create all algorithm instances ordered by actual performance (fastest to slowest)
     std::vector<SortablePicture*> algorithms = {
-        new ThreadedQuickSortPicture(1),      // 0 - GCD Concurrent QuickSort (fastest)
-        new QuickSortPicture(),               // 1 - QuickSort
-        new HeapSortPicture(),                // 2 - Heap Sort  
-        new ThreadedQuickSortPicture(2),      // 3 - Merge Sort
-        new ShellSortPicture(),               // 4 - Shell Sort
-        new SelectionSortPicture(),           // 5 - Selection Sort
-        new InsertionSortPicture(),           // 6 - Insertion Sort
-        new BubbleSortPicture(),              // 7 - Bubble Sort (slowest)
-        new RBubbleSortPicture(),             // 8 - Reverse Bubble Sort (hidden)
-        new BiDirBubbleSortPicture()          // 9 - Bidirectional Bubble Sort (hidden)
+        new RadixSortPicture(),                // 0 - Ultra Radix Sort (0.007s)
+        new FixedQuickSortPicture(),          // 1 - Optimized QuickSort (0.009s)
+        new OptimizedBubbleSortPicture(),     // 2 - Optimized Bubble Sort (0.014s)
+        new ThreadedQuickSortPicture(1),      // 3 - GCD Concurrent QuickSort (fast)
+        new HeapSortPicture(),                // 4 - Heap Sort (0.036s)
+        new ShellSortPicture(),               // 5 - Shell Sort (0.069s)
+        new ThreadedQuickSortPicture(2),      // 6 - Merge Sort (0.109s)
+        new SelectionSortPicture(),           // 7 - Selection Sort (O(n²))
+        new InsertionSortPicture(),           // 8 - Insertion Sort (very slow O(n²))
+        new BubbleSortPicture(),              // 9 - Bubble Sort (slowest O(n²))
+        new BiDirBubbleSortPicture()          // 10 - Bidirectional Bubble Sort (hidden)
     };
     
     // Clear existing arrays
@@ -83,12 +100,12 @@
     for (int i = 0; i < algorithms.size(); i++) {
         SortablePicture* sortPicture = algorithms[i];
         
-        // Calculate grid position (4 columns, 2 rows) for 8 visible algorithms
+        // Calculate grid position (3 columns, 3 rows) for 9 visible algorithms
         // Visual layout: top-left (fastest) to bottom-right (slowest)
-        int col = i % 4;
-        int row = i / 4;
+        int col = i % 3;
+        int row = i / 3;
         int x = startX + col * (windowWidth + spacing);
-        // Position rows from top down (startY is already at top of screen)
+        // Position rows from top down (subtract because macOS Y=0 is at bottom)
         int y = startY - row * (windowHeight + spacing);
         
         // Position the window
@@ -99,8 +116,8 @@
         NSValue *sortPictureValue = [NSValue valueWithPointer:sortPicture];
         [self.activeSortPictures addObject:sortPictureValue];
         
-        // Default visibility: disable extra bubble sorts (indices 8 and 9) 
-        BOOL isVisible = (i != 8 && i != 9); // Hide "Reverse Bubble Sort" and "Bidirectional Bubble Sort"
+        // Default visibility: show first 9 algorithms for perfect 3x3 grid
+        BOOL isVisible = (i < 9); // Show all algorithms except BiDirBubbleSortPicture
         [self.algorithmVisibility addObject:@(isVisible)];
         
         // Hide windows for disabled algorithms
@@ -131,7 +148,7 @@
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
-    return YES;
+    return NO;  // Keep app running even if windows are closed
 }
 
 #pragma mark - Menu Actions
@@ -172,10 +189,17 @@
 
 - (void)startSequentialSorting:(NSArray*)sortPictures atIndex:(NSInteger)index {
     if (index >= sortPictures.count) {
-        // All done - re-enable image loading
+        // All done - keep display updates running and re-enable image loading
+        // [self stopDisplayUpdates];  // Keep display updates running to show final results
         self.sortingInProgress = NO;
         [self updateLoadImageMenuState];
+        NSLog(@"=== ALL SEQUENTIAL SORTING COMPLETED - APP STAYS RUNNING ===");
         return;
+    }
+
+    // Start display updates for the first algorithm
+    if (index == 0) {
+        [self startDisplayUpdates];
     }
     
     NSValue *sortPictureValue = sortPictures[index];
@@ -207,6 +231,9 @@
     __block NSInteger completedSorts = 0;
     NSInteger totalSorts = sortPictures.count;
     
+    // Start 60fps display updates for smooth visualization
+    [self startDisplayUpdates];
+    
     for (NSValue *sortPictureValue in sortPictures) {
         SortablePicture* sortPicture = (SortablePicture*)[sortPictureValue pointerValue];
         if (sortPicture) {
@@ -224,9 +251,17 @@
                     // Check if all sorts are complete
                     completedSorts++;
                     if (completedSorts >= totalSorts) {
-                        // Re-enable image loading when all sorting is complete
+                        // Stop display updates and re-enable image loading when all sorting is complete
+                        [self stopDisplayUpdates];
                         self.sortingInProgress = NO;
                         [self updateLoadImageMenuState];
+                        
+                        // Auto-quit disabled - app stays open after sorting completes
+                        NSLog(@"=== ALL SORTING COMPLETED ===");
+                        // dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        //     NSLog(@"=== EXITING NOW ===");
+                        //     [[NSApplication sharedApplication] terminate:nil];
+                        // });
                     }
                 });
             });
@@ -235,16 +270,13 @@
 }
 
 - (IBAction)resetAllAlgorithms:(id)sender {
-    // Hide any victory screens before resetting
+    // Reset all currently open sorting windows
     for (NSValue *sortPictureValue in self.activeSortPictures) {
         SortablePicture* sortPicture = (SortablePicture*)[sortPictureValue pointerValue];
         if (sortPicture) {
-            sortPicture->hideBigTimingDisplay();
+            sortPicture->resetSorting();
         }
     }
-    
-    // Recreate the grid to reset all algorithms
-    [self createAlgorithmComparisonGrid];
 }
 
 
@@ -414,18 +446,22 @@
     // Add another separator before algorithm list
     [algorithmMenu addItem:[NSMenuItem separatorItem]];
     
-    // Add algorithm window toggles (ordered by true performance, fastest to slowest)
+    // Add algorithm window toggles (must match the algorithms array indices exactly!)
     NSArray* algorithmNames = @[
-        @"GCD Concurrent Quick Sort", // 0 - Fastest
-        @"Quick Sort",               // 1
-        @"Heap Sort",                // 2  
-        @"Merge Sort",               // 3
-        @"Shell Sort",               // 4
-        @"Selection Sort",           // 5
-        @"Insertion Sort",           // 6
-        @"Bubble Sort",              // 7 - Slowest
-        @"Reverse Bubble Sort",      // 8 - Hidden by default
-        @"Bidirectional Bubble Sort" // 9 - Hidden by default
+        @"Radix Sort",               // 0 - RadixSortPicture (Ultra Radix Sort O(n)!)
+        @"Fixed Quick Sort",         // 1 - FixedQuickSortPicture (Fixed Optimized QuickSort)
+        @"Optimized Quick Sort",     // 2 - OptimizedQuickSortPicture (Ultra-Optimized QuickSort)
+        @"GCD Concurrent Quick Sort", // 3 - ThreadedQuickSortPicture(1) (GCD Concurrent QuickSort)
+        @"Quick Sort",               // 4 - QuickSortPicture (Regular QuickSort)
+        @"Heap Sort",                // 5 - HeapSortPicture (Heap Sort)
+        @"Merge Sort",               // 6 - ThreadedQuickSortPicture(2) (Merge Sort)
+        @"Shell Sort",               // 7 - ShellSortPicture (Shell Sort)
+        @"Selection Sort",           // 8 - SelectionSortPicture (Selection Sort)
+        @"Insertion Sort",           // 9 - InsertionSortPicture (Insertion Sort)
+        @"Bubble Sort",              // 10 - BubbleSortPicture (Bubble Sort - slowest)
+        @"Optimized Bubble Sort",    // 11 - OptimizedBubbleSortPicture (Optimized Bubble Sort)
+        @"Reverse Bubble Sort",      // 12 - RBubbleSortPicture (Reverse Bubble Sort - hidden)
+        @"Bidirectional Bubble Sort" // 13 - BiDirBubbleSortPicture (Bidirectional Bubble Sort - hidden)
     ];
     
     for (int i = 0; i < algorithmNames.count; i++) {
@@ -435,7 +471,7 @@
         [item setTarget:self];
         [item setTag:i];
         // Set initial state based on default visibility  
-        BOOL isVisible = (i != 8 && i != 9); // Match the visibility logic above
+        BOOL isVisible = (i == 0 || i == 1); // Match the visibility logic above - both QuickSorts
         [item setState:isVisible ? NSControlStateValueOn : NSControlStateValueOff];
         [algorithmMenu addItem:item];
     }
@@ -541,14 +577,18 @@
     BOOL showStats = [menuItem state] == NSControlStateValueOff; // Toggle to opposite state
     [menuItem setState:showStats ? NSControlStateValueOn : NSControlStateValueOff];
     
+    NSLog(@"toggleStatisticsDisplay: toggled to %s", showStats ? "ON" : "OFF");
+    
     // Apply to all visible sort pictures (now including running algorithms)
     for (int i = 0; i < self.activeSortPictures.count; i++) {
         if ([[self.algorithmVisibility objectAtIndex:i] boolValue]) {
             NSValue *sortPictureValue = [self.activeSortPictures objectAtIndex:i];
             SortablePicture* sortPicture = (SortablePicture*)[sortPictureValue pointerValue];
             if (sortPicture) {
-                // Use the new overlaysEnabled flag to control statistics during runtime
-                sortPicture->SetOverlaysEnabled(showStats);
+                NSLog(@"toggleStatisticsDisplay: setting overlays to %s for sort picture %d", 
+                      showStats ? "TRUE" : "FALSE", i);
+                // FORCE overlays to always be enabled for debugging
+                sortPicture->SetOverlaysEnabled(true); // Always true regardless of menu
             }
         }
     }
@@ -559,11 +599,14 @@
     NSString* imageFile = nil;
     NSInteger algorithmIndex = -1;
     
-    // Parse arguments looking for --algorithm and --image
+    // Parse arguments looking for --algorithm, --image, and --start
     for (NSInteger i = 1; i < arguments.count; i++) {
         NSString* arg = arguments[i];
-        
-        if ([arg isEqualToString:@"--algorithm"] && i + 1 < arguments.count) {
+
+        if ([arg isEqualToString:@"--start"]) {
+            self.shouldAutoStart = YES;
+            NSLog(@"Auto-start enabled via --start argument");
+        } else if ([arg isEqualToString:@"--algorithm"] && i + 1 < arguments.count) {
             // --algorithm 0 (for GCD QuickSort), --algorithm gcd, etc.
             NSString* algorithmArg = arguments[i + 1];
             if ([algorithmArg isEqualToString:@"gcd"] || [algorithmArg isEqualToString:@"0"]) {
@@ -651,6 +694,54 @@
         }
         return event; // Pass the event through
     }];
+}
+
+#pragma mark - Display Update System
+
+- (void)startDisplayUpdates {
+    if (self.displayTimer) {
+        return; // Already running
+    }
+    
+    NSLog(@"Starting 60fps display updates with NSTimer");
+    
+    // Create NSTimer for 60fps updates (16.67ms interval)
+    self.displayTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
+                                                         target:self
+                                                       selector:@selector(displayTimerCallback:)
+                                                       userInfo:nil
+                                                        repeats:YES];
+}
+
+- (void)stopDisplayUpdates {
+    if (self.displayTimer) {
+        NSLog(@"Stopping display updates");
+        [self.displayTimer invalidate];
+        self.displayTimer = nil;
+    }
+}
+
+- (void)displayTimerCallback:(NSTimer *)timer {
+    static int callCount = 0;
+    callCount++;
+    
+    // Update all active sort picture displays at 60fps
+    for (NSValue *sortPictureValue in self.activeSortPictures) {
+        SortablePicture* sortPicture = (SortablePicture*)[sortPictureValue pointerValue];
+        if (sortPicture) {
+            // Always update display to show current state
+            sortPicture->Draw();
+            sortPicture->UpdateStats();  // Update stats overlay
+            sortPicture->updateOverlayInfo();
+            
+            // Debug log every 30 calls (twice per second during sorting)
+            if (callCount % 30 == 0) {
+                NSLog(@"Timer callback #%d - updating overlays for running=%s, overlaysEnabled=%s", 
+                      callCount, sortPicture->IsRunning() ? "YES" : "NO",
+                      sortPicture->GetOverlaysEnabled() ? "YES" : "NO");
+            }
+        }
+    }
 }
 
 @end

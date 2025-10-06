@@ -77,6 +77,8 @@ void FixedQuickSortPicture::QuickSort(int32_t lower, int32_t upper) {
             pivot = Partition(lower, upper);
             regular_partitions++;
         }
+
+        // No manual draw calls - the NSTimer + SwapPixels model handles UI updates
         
         // Tail recursion optimization: recurse on smaller half
         if (pivot - lower < upper - pivot) {
@@ -95,22 +97,18 @@ int32_t FixedQuickSortPicture::Partition(int32_t lower, int32_t upper) {
     
     // Sort first, middle, last
     if (pixelIndexArray[mid] < pixelIndexArray[lower]) {
-        std::swap(pixelIndexArray[lower], pixelIndexArray[mid]);
-        swaps++;
+        SwapPixels(lower, mid);
     }
     if (pixelIndexArray[upper] < pixelIndexArray[lower]) {
-        std::swap(pixelIndexArray[lower], pixelIndexArray[upper]);
-        swaps++;
+        SwapPixels(lower, upper);
     }
     if (pixelIndexArray[upper] < pixelIndexArray[mid]) {
-        std::swap(pixelIndexArray[mid], pixelIndexArray[upper]);
-        swaps++;
+        SwapPixels(mid, upper);
     }
     comparisons += 3;
     
     // Place median at upper-1 position
-    std::swap(pixelIndexArray[mid], pixelIndexArray[upper - 1]);
-    swaps++;
+    SwapPixels(mid, upper - 1);
     
     uint32_t pivotValue = pixelIndexArray[upper - 1];
     
@@ -124,14 +122,12 @@ int32_t FixedQuickSortPicture::Partition(int32_t lower, int32_t upper) {
         comparisons += 2;
         
         if (i >= j) break;
-        
-        std::swap(pixelIndexArray[i], pixelIndexArray[j]);
-        swaps++;
+
+        SwapPixels(i, j);
     }
-    
+
     // Restore pivot
-    std::swap(pixelIndexArray[i], pixelIndexArray[upper - 1]);
-    swaps++;
+    SwapPixels(i, upper - 1);
     
     return i;
 }

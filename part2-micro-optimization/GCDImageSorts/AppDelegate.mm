@@ -34,7 +34,7 @@
     self.activeSortPictures = [[NSMutableArray alloc] init];
     self.algorithmVisibility = [[NSMutableArray alloc] init];
     self.sortingInProgress = NO;
-    self.sequentialSorting = YES; // Default to sequential sorting
+    self.sequentialSorting = NO; // Default to parallel sorting
     self.shouldAutoStart = NO; // Default to manual start
     
     // Create windows for all sorting algorithms in a grid layout
@@ -448,20 +448,17 @@
     
     // Add algorithm window toggles (must match the algorithms array indices exactly!)
     NSArray* algorithmNames = @[
-        @"Radix Sort",               // 0 - RadixSortPicture (Ultra Radix Sort O(n)!)
-        @"Fixed Quick Sort",         // 1 - FixedQuickSortPicture (Fixed Optimized QuickSort)
-        @"Optimized Quick Sort",     // 2 - OptimizedQuickSortPicture (Ultra-Optimized QuickSort)
-        @"GCD Concurrent Quick Sort", // 3 - ThreadedQuickSortPicture(1) (GCD Concurrent QuickSort)
-        @"Quick Sort",               // 4 - QuickSortPicture (Regular QuickSort)
-        @"Heap Sort",                // 5 - HeapSortPicture (Heap Sort)
+        @"Ultra Radix Sort",         // 0 - RadixSortPicture (Ultra Radix Sort O(n)!)
+        @"Optimized QuickSort",      // 1 - FixedQuickSortPicture (Optimized QuickSort)
+        @"Optimized BubbleSort",     // 2 - OptimizedBubbleSortPicture (Optimized Bubble Sort)
+        @"GCD Concurrent QuickSort", // 3 - ThreadedQuickSortPicture(1) (GCD Concurrent QuickSort)
+        @"Heap Sort",                // 4 - HeapSortPicture (Heap Sort)
+        @"Shell Sort",               // 5 - ShellSortPicture (Shell Sort)
         @"Merge Sort",               // 6 - ThreadedQuickSortPicture(2) (Merge Sort)
-        @"Shell Sort",               // 7 - ShellSortPicture (Shell Sort)
-        @"Selection Sort",           // 8 - SelectionSortPicture (Selection Sort)
-        @"Insertion Sort",           // 9 - InsertionSortPicture (Insertion Sort)
-        @"Bubble Sort",              // 10 - BubbleSortPicture (Bubble Sort - slowest)
-        @"Optimized Bubble Sort",    // 11 - OptimizedBubbleSortPicture (Optimized Bubble Sort)
-        @"Reverse Bubble Sort",      // 12 - RBubbleSortPicture (Reverse Bubble Sort - hidden)
-        @"Bidirectional Bubble Sort" // 13 - BiDirBubbleSortPicture (Bidirectional Bubble Sort - hidden)
+        @"Selection Sort",           // 7 - SelectionSortPicture (Selection Sort)
+        @"Insertion Sort",           // 8 - InsertionSortPicture (Insertion Sort)
+        @"Bubble Sort",              // 9 - BubbleSortPicture (Bubble Sort - slowest)
+        @"Bidirectional Bubble Sort" // 10 - BiDirBubbleSortPicture (Bidirectional Bubble Sort - hidden)
     ];
     
     for (int i = 0; i < algorithmNames.count; i++) {
@@ -470,8 +467,8 @@
                                               keyEquivalent:@""];
         [item setTarget:self];
         [item setTag:i];
-        // Set initial state based on default visibility  
-        BOOL isVisible = (i == 0 || i == 1); // Match the visibility logic above - both QuickSorts
+        // Set initial state based on default visibility
+        BOOL isVisible = (i < 9); // Match the visibility logic above - first 9 algorithms
         [item setState:isVisible ? NSControlStateValueOn : NSControlStateValueOff];
         [algorithmMenu addItem:item];
     }
@@ -736,8 +733,9 @@
             
             // Debug log every 30 calls (twice per second during sorting)
             if (callCount % 30 == 0) {
-                NSLog(@"Timer callback #%d - updating overlays for running=%s, overlaysEnabled=%s", 
-                      callCount, sortPicture->IsRunning() ? "YES" : "NO",
+                NSLog(@"Timer callback #%d - running=%s, overlaysEnabled=%s",
+                      callCount,
+                      sortPicture->IsRunning() ? "YES" : "NO",
                       sortPicture->GetOverlaysEnabled() ? "YES" : "NO");
             }
         }

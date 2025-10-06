@@ -79,6 +79,9 @@ void RadixSortPicture::RadixSortLSD() {
             CountingSortByByte(byteIndex);
         }
         passes++;
+
+        // No manual draw calls - let the NSTimer handle all UI updates
+        NSLog(@"⚡ RADIX SORT: Completed pass %u/4", byteIndex + 1);
     }
 }
 

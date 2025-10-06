@@ -560,10 +560,17 @@ void SortablePicture::SwapBytes(uint8_t* a, uint8_t* b, uint32_t numBytes) {
  */
 void SortablePicture::SwapPixels(uint32_t indexA, uint32_t indexB) {
     if (indexA >= linearPictSize || indexB >= linearPictSize) return;
-    
+
     std::swap(pixelIndexArray[indexA], pixelIndexArray[indexB]);
     swaps++;
-    
+
+    // Debug logging to track swap calls
+    static uint64_t swapCallCount = 0;
+    swapCallCount++;
+    if (swapCallCount % 10000 == 0) { // Log every 10K swaps
+        NSLog(@"SwapPixels() call #%llu - total swaps: %llu", swapCallCount, swaps);
+    }
+
 #ifdef SPEED_CONTROL
     nanosleep(&swapWaitTime, nullptr);
 #endif
@@ -587,7 +594,27 @@ bool SortablePicture::InOrder(uint32_t indexA, uint32_t indexB) {
 }
 
 void SortablePicture::Draw() {
-    if (!pixelBuffer || !imageView || !originalBitmapData) return;
+    // CRITICAL: Check if we're on the main thread
+    if (![NSThread isMainThread]) {
+        NSLog(@"❌ THREADING ERROR: Draw() called from background thread! This will cause UI bugs.");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            Draw();
+        });
+        return;
+    }
+
+    if (!pixelBuffer || !imageView || !originalBitmapData) {
+        NSLog(@"Draw() called but missing components: pixelBuffer=%p, imageView=%p, originalBitmapData=%p",
+              pixelBuffer, imageView, originalBitmapData);
+        return;
+    }
+
+    // Debug logging to track draw calls
+    static int drawCallCount = 0;
+    drawCallCount++;
+    if (drawCallCount % 30 == 0) { // Log every 30 calls
+        NSLog(@"✅ Draw() call #%d - swaps: %llu (main thread)", drawCallCount, swaps);
+    }
     
     // No throttling needed - NSTimer in AppDelegate already controls 60fps rate
     // This ensures smooth, fluid animations synchronized with the display refresh

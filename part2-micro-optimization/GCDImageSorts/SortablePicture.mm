@@ -615,7 +615,7 @@ void SortablePicture::Draw() {
     if (drawCallCount % 30 == 0) { // Log every 30 calls
         NSLog(@"✅ Draw() call #%d - swaps: %llu (main thread)", drawCallCount, swaps);
     }
-    
+
     // No throttling needed - NSTimer in AppDelegate already controls 60fps rate
     // This ensures smooth, fluid animations synchronized with the display refresh
     
@@ -1151,8 +1151,8 @@ void SortablePicture::updateOverlayInfo() {
             NSRect frame = [overlayView frame];
             CGFloat alpha = [overlayView alphaValue];
             NSView* superview = [overlayView superview];
-            
-            NSLog(@"OVERLAY DEBUG: hidden=%s, frame=%@, alpha=%.2f, superview=%p, swaps=%llu", 
+
+            NSLog(@"OVERLAY DEBUG: hidden=%s, frame=%@, alpha=%.2f, superview=%p, swaps=%llu",
                   isHidden ? "YES" : "NO", NSStringFromRect(frame), alpha, superview, swaps);
         } else {
             NSLog(@"OVERLAY DEBUG: overlayView is NULL!");

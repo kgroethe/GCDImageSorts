@@ -621,9 +621,9 @@ void OptimizedBubbleSortPicture::OptimizedBubbleSort_BranchlessParallel() {
         
         iteration++;
         
-        // Progress logging (kept minimal to avoid overhead)
+        // Progress logging
         if (iteration % 500 == 0) {
-            NSLog(@"🚀 BRANCHLESS HYBRID: Iteration %u", iteration);
+            NSLog(@"🔄 ODD-EVEN: Iteration %u completed", iteration);
         }
     }
     
